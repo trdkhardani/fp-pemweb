@@ -12,10 +12,46 @@ export const useApp = defineStore({
     url_short: "",
     url_click: 0,
     temp: "",
-    token:
-      "",
+    token: "",
+    input: []
   }),
   actions: {
+    async addUrl() {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios
+        .post(baseurl + "/shorten", {
+
+          originalurl: this.input.originalurl,
+          customurl: this.input.customurl
+        }, config)
+        .then((res) => {
+          console.log("added");
+          this.getUrls();
+        });
+    },
+
+    async editUrl(docid) {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios
+        .patch(baseurl + "/updateshorten/" + docid, {
+
+          originalurl: this.input.originalurl,
+          customurl: this.input.customurl
+        }, config)
+        .then((res) => {
+          console.log("edited");
+          this.getUrls();
+        });
+    },
+
     async getUrls() {
       await this.getToken();
       const config = {
@@ -36,7 +72,7 @@ export const useApp = defineStore({
         },
       };
       axios.delete(baseurl + "/deleteshorten/" + id, config).then((res) => {
-        console.log("Deleted");
+        //console.log("Deleted");
         this.getUrls();
       });
     },
@@ -54,21 +90,21 @@ export const useApp = defineStore({
       axios.get(baseurl + "/go/" + customurl, config).then((res) => {
         this.temp = res.data;
         this.redirect(this.temp.url);
-        console.log(this.temp);
+        //console.log(this.temp);
         this.temp = "";
       });
     },
 
     async getToken() {
-      await axios.post(baseurl + "/login", {
-        email: "rama@gov.id",
-        password: "tesasasat",
-      }).then((res) => {
-        this.token = res.data.accestoken;
-        console.log(res.data.accestoken);
-      });
-      
-    
+      await axios
+        .post(baseurl + "/login", {
+          email: "rama@gov.id",
+          password: "tesasasat",
+        })
+        .then((res) => {
+          this.token = res.data.accestoken;
+          //console.log(res.data.accestoken);
+        });
     },
   },
 });
